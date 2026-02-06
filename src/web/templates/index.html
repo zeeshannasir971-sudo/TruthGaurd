@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fake News Detector (Sentiment + ML)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #0f172a; color: #e2e8f0; margin: 0; }
+    .container { max-width: 960px; margin: 40px auto; padding: 24px; background: #111827; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.4);}    
+    h1 { font-size: 28px; margin: 0 0 8px; }
+    p.desc { color: #94a3b8; margin-top: 0; }
+    .card { display: grid; grid-template-columns: 1fr; gap: 16px; margin-top: 24px; }
+    .input-row { display: flex; gap: 12px; align-items: center; }
+    input[type="text"] { flex: 1; padding: 12px 14px; border-radius: 10px; border: 1px solid #334155; background: #0b1020; color: #e2e8f0; }
+    textarea { width: 100%; min-height: 140px; padding: 12px 14px; border-radius: 10px; border: 1px solid #334155; background: #0b1020; color: #e2e8f0; }
+    .btn { padding: 10px 16px; border-radius: 10px; border: none; cursor: pointer; font-weight: 600; }
+    .btn-primary { background: #3b82f6; color: #fff; }
+    .btn-secondary { background: #1f2937; color: #e5e7eb; border: 1px solid #334155; }
+    .tabs { display: inline-flex; background: #0b1020; border: 1px solid #334155; border-radius: 12px; overflow: hidden; }
+    .tab { padding: 10px 14px; cursor: pointer; color: #94a3b8; }
+    .tab.active { background: #1f2937; color: #fff; }
+    .result { margin-top: 24px; padding: 14px; background: #0b1020; border: 1px solid #334155; border-radius: 12px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .badge { display: inline-block; padding: 6px 10px; border-radius: 8px; font-size: 12px; }
+    .badge-green { background: #064e3b; color: #a7f3d0; }
+    .badge-red { background: #7f1d1d; color: #fecaca; }
+    .small { color: #94a3b8; font-size: 13px; }
+    a { color: #93c5fd; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Fake News Detector</h1>
+    <p class="desc">Combines text features (TF-IDF) with sentiment analysis (polarity & subjectivity) to improve detection of emotionally manipulative content.</p>
+
+    <div class="tabs" id="modeTabs">
+      <div class="tab active" data-mode="url">Article URL</div>
+      <div class="tab" data-mode="text">Paste Text</div>
+    </div>
+
+    <div class="card" id="urlCard">
+      <div class="input-row">
+        <input type="text" id="articleUrl" placeholder="Paste article URL here (http...)" />
+        <button class="btn btn-primary" id="analyzeUrlBtn">Analyze</button>
+      </div>
+    </div>
+
+    <div class="card" id="textCard" style="display:none;">
+      <textarea id="articleText" placeholder="Paste headline or article text here..."></textarea>
+      <button class="btn btn-primary" id="analyzeTextBtn">Analyze</button>
+    </div>
+
+    <div class="result" id="resultBox" style="display:none;"></div>
+  </div>
+
+<script>
+const tabs = document.querySelectorAll('.tab');
+const urlCard = document.getElementById('urlCard');
+const textCard = document.getElementById('textCard');
+const resultBox = document.getElementById('resultBox');
+let currentMode = 'url';
+
+tabs.forEach(t => {
+  t.addEventListener('click', () => {
+    tabs.forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    currentMode = t.dataset.mode;
+    if (currentMode === 'url') { urlCard.style.display = ''; textCard.style.display = 'none'; }
+    else { urlCard.style.display = 'none'; textCard.style.display = ''; }
+  });
+});
+
+async function analyze(payload) {
+  resultBox.style.display = 'block';
+  resultBox.innerHTML = '<span class="small">Analyzing...</span>';
+  try {
+    const res = await fetch('/analyze', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Error analyzing');
+    const r = data.result;
+    const badge = r.label === 1 ? '<span class="badge badge-red">Likely Fake</span>' : '<span class="badge badge-green">Likely Real</span>';
+    const prob = (r.prob_fake * 100).toFixed(1) + '%';
+    const senti = `Polarity: ${r.sentiment.polarity.toFixed(3)}, Subjectivity: ${r.sentiment.subjectivity.toFixed(3)}`;
+
+    let corroborationHtml = '';
+    if (data.corroboration && data.corroboration.length) {
+      corroborationHtml = '<div><strong>Web corroboration:</strong><ul>' +
+        data.corroboration.map(c => `<li><a href="${c.link}" target="_blank">${c.title || c.link}</a> - <span class="small">${c.snippet || ''}</span></li>`).join('') +
+        '</ul></div>';
+    } else {
+      corroborationHtml = '<div class="small">No corroborating sources found.</div>';
+    }
+
+    resultBox.innerHTML = `
+      <div class="grid">
+        <div>
+          <div>${badge}</div>
+          <div class="small">Probability (Fake): ${prob}</div>
+          <div class="small">${senti}</div>
+        </div>
+        <div>
+          ${corroborationHtml}
+        </div>
+      </div>
+    `;
+  } catch (err) {
+    resultBox.innerHTML = `<span class="small" style="color:#fca5a5;">${err.message}</span>`;
+  }
+}
+
+document.getElementById('analyzeUrlBtn').addEventListener('click', () => {
+  const url = document.getElementById('articleUrl').value.trim();
+  if (!url) return alert('Please paste a valid article URL.');
+  analyze({ mode: 'url', url });
+});
+
+document.getElementById('analyzeTextBtn').addEventListener('click', () => {
+  const text = document.getElementById('articleText').value.trim();
+  if (!text) return alert('Please paste some text.');
+  analyze({ mode: 'text', text });
+});
+</script>
+</body>
+</html>
