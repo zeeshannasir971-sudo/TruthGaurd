@@ -1,77 +1,192 @@
-# 🚀 Deploy TruthGuard (Free Version)
+# 🚀 Deploy TruthGuard to Vercel/Netlify
 
-This guide provides exact instructions to deploy TruthGuard completely for **FREE**.
+## Quick Deployment Guide (5 Steps)
 
-## 🏗️ Architecture
-- **Frontend:** Netlify (Free)
-- **Backend:** Hugging Face Spaces (Free - No Credit Card Required)
-- **Models:** Hugging Face (Integrated)
+### Step 1: Upload Models to Hugging Face (One-Time)
 
----
+```bash
+# Install Hugging Face CLI
+pip install huggingface_hub
 
-## 1️⃣ Deploy Backend (Hugging Face Spaces)
+# Login to Hugging Face
+huggingface-cli login
 
-We will deploy the Python backend on Hugging Face Spaces, which offers generous free resources for ML apps.
+# Upload models
+python upload_to_huggingface.py
+```
 
-1.  **Log in to Hugging Face**
-    - Go to [huggingface.co](https://huggingface.co) and log in.
+**What this does:**
+- Creates a repository on Hugging Face
+- Uploads your 3 model files (.pkl)
+- Gives you public download URLs
 
-2.  **Create a New Space**
-    - Click your profile picture > **"New Space"**.
-    - **Space Name:** `truthguard-backend`
-    - **License:** `MIT` (optional)
-    - **SDK:** Select **Docker** (Important! Do not select Streamlit/Gradio).
-    - **Space Hardware:** Select **"Free"** (2 vCPU · 16GB RAM).
-    - Click **"Create Space"**.
+### Step 2: Update Download Script
 
-3.  **Connect to GitHub**
-    - In your new Space, verify you are in the **"App"** tab (or go to "Settings").
-    - We will deploy by pushing our code to this Space. The easiest way is to mirror or push your existing GitHub repo.
-    - **Option A (Easy):** Go to **"Settings"** tab in your Space > **"Git repository"** section > Connect your GitHub repository `zeeshannasir971-sudo/TruthGaurd`.
-    - **Option B (Manual):** Hugging Face gives you a git command. You can add it as a remote and push:
-      ```bash
-      git remote add space https://huggingface.co/spaces/YOUR_USERNAME/truthguard-backend
-      git push space main
-      ```
+Edit `src/scripts/download_assets.py`:
 
-4.  **Wait for Build**
-    - The Space will start "Building". It might take 3-5 minutes as it installs dependencies and downloads the models.
-    - Once "Running", you will see your API is live.
-    - **Get the URL:** Click the **Embed this space** button (top right) or look at the URL bar. It usually looks like:
-      `https://yourusername-truthguard-backend.hf.space`
-      (Make sure to use the direct URL, not the iframe one. Right-click the "Direct URL" link if available, or just append `/` to the domain).
+```python
+# Replace YOUR_USERNAME with your actual Hugging Face username
+HUGGINGFACE_BASE_URL = "https://huggingface.co/YOUR_USERNAME/truthguard-models/resolve/main"
+```
 
----
+### Step 3: Test Locally
 
-## 2️⃣ Deploy Frontend (Netlify)
+```bash
+# Delete local models
+rm src/ml/artifacts/*.pkl
 
-1.  **Log in to Netlify**
-    - Go to [app.netlify.com](https://app.netlify.com).
+# Test download
+python src/scripts/download_assets.py
 
-2.  **Add New Site**
-    - Click **"Add new site"** > **"Import an existing project"**.
+# Should download all 3 files successfully
+```
 
-3.  **Connect to GitHub**
-    - Select **GitHub** and choose `zeeshannasir971-sudo/TruthGaurd`.
+### Step 4: Deploy Backend
 
-4.  **Configure Build**
-    - **Base directory:** `frontend`
-    - **Build command:** `npm run build`
-    - **Publish directory:** `.next`
-    - Click **"Deploy"**.
+#### Option A: Vercel (Easiest)
+```bash
+npm i -g vercel
+vercel
+```
 
-5.  **Connect to Backend**
-    - Go to **"Site configuration"** > **"Environment variables"**.
-    - Add Variable:
-        - **Key:** `NEXT_PUBLIC_API_URL`
-        - **Value:** Your Hugging Face Space URL (e.g., `https://zeeshann07-truthguard-backend.hf.space`)
-          *Note: Ensure no trailing slash `/` at the end unless your code expects it.*
-    - Go to **"Deploys"** and **"Trigger deploy"** to update the site.
+#### Option B: Railway
+1. Go to https://railway.app
+2. Connect GitHub repo
+3. Deploy automatically
 
----
+#### Option C: Render
+1. Go to https://render.com
+2. New Web Service
+3. Connect repo
 
-## ✅ Done!
-- **Frontend:** Netlify
-- **Backend:** Hugging Face Spaces (Docker)
-- **Cost:** $0/month
+### Step 5: Deploy Frontend
 
+```bash
+cd frontend
+
+# Update API URL
+echo "NEXT_PUBLIC_API_URL=https://your-backend-url.vercel.app" > .env.production
+
+# Deploy
+vercel --prod
+```
+
+## ✅ That's It!
+
+Your app is now deployed with:
+- ✅ Code on GitHub (small)
+- ✅ Models on Hugging Face (large)
+- ✅ Automatic download on deploy
+- ✅ Fast inference
+
+## 📊 What Gets Deployed
+
+### GitHub (5 MB)
+```
+✅ All code files
+✅ download_assets.py script
+✅ Directory structure
+❌ No .pkl files
+❌ No .csv files
+```
+
+### Hugging Face (85 MB)
+```
+✅ fake_news_model.pkl
+✅ tfidf_word_vectorizer.pkl
+✅ tfidf_char_vectorizer.pkl
+```
+
+### Deployed App (90 MB)
+```
+✅ Code from GitHub
+✅ Models downloaded from Hugging Face
+✅ Ready to serve predictions
+```
+
+## 🔄 Deployment Flow
+
+```
+1. Push code to GitHub
+   ↓
+2. Vercel/Netlify detects push
+   ↓
+3. Clones repository
+   ↓
+4. Runs: pip install -r requirements.txt
+   ↓
+5. Runs: python src/scripts/download_assets.py
+   ↓
+6. Downloads models from Hugging Face
+   ↓
+7. Starts Flask app
+   ↓
+8. App ready! 🎉
+```
+
+## ⚡ Performance
+
+### First Deploy
+- Build time: 2-3 minutes
+- Model download: 30 seconds
+- Total: ~3 minutes
+
+### Cold Start (First Request)
+- Model loading: 2-5 seconds
+- Prediction: <100ms
+
+### Warm Requests
+- Prediction: <100ms
+- (Models cached in memory)
+
+## 🎯 Deployment Checklist
+
+Before deploying, make sure:
+
+- [ ] Models trained locally (`python -m src.ml.pipeline`)
+- [ ] Hugging Face account created
+- [ ] Models uploaded to Hugging Face
+- [ ] download_assets.py updated with your URLs
+- [ ] Tested download locally
+- [ ] .gitignore excludes .pkl files
+- [ ] Backend deployed
+- [ ] Frontend .env.production updated
+- [ ] Frontend deployed
+- [ ] Tested end-to-end
+
+## 🆘 Troubleshooting
+
+### "Model files not found"
+- Check Hugging Face URLs in download_assets.py
+- Make sure files are public
+- Test download locally first
+
+### "Build failed"
+- Check build logs
+- Verify requirements.txt is correct
+- Ensure download_assets.py has no errors
+
+### "Function too large"
+- This is normal - models are downloaded, not bundled
+- Vercel/Netlify will handle it
+
+### "Timeout during build"
+- Increase timeout in vercel.json
+- Or use Railway/Render (no timeout)
+
+## 📚 Full Documentation
+
+- `DEPLOYMENT_STRATEGY.md` - Complete strategy explanation
+- `DEPLOYMENT_GUIDE.md` - Detailed deployment guide
+- `README.md` - Project overview
+
+## 🎉 Success!
+
+Once deployed, your app will:
+- ✅ Work on Vercel/Netlify
+- ✅ Download models automatically
+- ✅ Serve predictions fast
+- ✅ Scale automatically
+- ✅ Cost $0 on free tier
+
+**Your TruthGuard app is ready for the world!** 🛡️

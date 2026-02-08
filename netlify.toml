@@ -1,8 +1,10 @@
 [build]
+  # Basic build settings
   base = "frontend"
   publish = ".next"
   command = "npm run build"
 
-[context.production.environment]
-  NEXT_PUBLIC_API_URL = "https://zeeshann07-truthguard-backend.hf.space"
+[build.environment]
   PYTHON_VERSION = "3.11"
+  # Ensure pip uses a compatible version
+  PIP_DEFAULT_TIMEOUT = "100"
