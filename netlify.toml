@@ -1,6 +1,7 @@
 [build]
   # Basic build settings
-  publish = "frontend/.next"
+  base = "frontend"
+  publish = ".next"
   command = "npm run build"
 
 [build.environment]
