@@ -1,102 +1,77 @@
-# 🚀 Deploy TruthGuard Now
+# 🚀 Deploy TruthGuard (Free Version)
 
-This guide provides exact step-by-step instructions to deploy TruthGuard using the configurations we've just set up.
+This guide provides exact instructions to deploy TruthGuard completely for **FREE**.
 
 ## 🏗️ Architecture
-- **Frontend:** Netlify (configured via `netlify.toml`)
-- **Backend:** Render (configured via `render.yaml`)
-- **Models:** Hugging Face (Auto-downloaded by Backend)
+- **Frontend:** Netlify (Free)
+- **Backend:** Hugging Face Spaces (Free - No Credit Card Required)
+- **Models:** Hugging Face (Integrated)
 
 ---
 
-## 1️⃣ Deploy Frontend (Netlify)
+## 1️⃣ Deploy Backend (Hugging Face Spaces)
 
-The frontend is a Next.js application located in the `frontend/` directory.
+We will deploy the Python backend on Hugging Face Spaces, which offers generous free resources for ML apps.
 
-1. **Log in to Netlify**
-   - Go to [app.netlify.com](https://app.netlify.com) and log in.
+1.  **Log in to Hugging Face**
+    - Go to [huggingface.co](https://huggingface.co) and log in.
 
-2. **Add New Site**
-   - Click **"Add new site"** > **"Import an existing project"**.
+2.  **Create a New Space**
+    - Click your profile picture > **"New Space"**.
+    - **Space Name:** `truthguard-backend`
+    - **License:** `MIT` (optional)
+    - **SDK:** Select **Docker** (Important! Do not select Streamlit/Gradio).
+    - **Space Hardware:** Select **"Free"** (2 vCPU · 16GB RAM).
+    - Click **"Create Space"**.
 
-3. **Connect to GitHub**
-   - Select **GitHub**.
-   - Authorize Netlify if asked.
-   - Search for and select your repo: `zeeshannasir971-sudo/TruthGaurd`.
+3.  **Connect to GitHub**
+    - In your new Space, verify you are in the **"App"** tab (or go to "Settings").
+    - We will deploy by pushing our code to this Space. The easiest way is to mirror or push your existing GitHub repo.
+    - **Option A (Easy):** Go to **"Settings"** tab in your Space > **"Git repository"** section > Connect your GitHub repository `zeeshannasir971-sudo/TruthGaurd`.
+    - **Option B (Manual):** Hugging Face gives you a git command. You can add it as a remote and push:
+      ```bash
+      git remote add space https://huggingface.co/spaces/YOUR_USERNAME/truthguard-backend
+      git push space main
+      ```
 
-4. **Configure Build (Auto-Detected)**
-   - Netlify will detect the `netlify.toml` file in the repository root.
-   - **Base directory:** `frontend` (Important! This should be auto-filled)
-   - **Build command:** `npm run build`
-   - **Publish directory:** `.next`
-   - **Functions directory:** `netlify/functions` (optional/default)
-
-5. **Deploy**
-   - Click **"Deploy TruthGuard"**.
-   - Wait for the build to complete (~2-3 minutes).
-   - You will get a URL like `https://truthguard-xyz.netlify.app`.
-
----
-
-## 2️⃣ Deploy Backend (Render)
-
-The backend is a Python Flask application that serves the API.
-
-1. **Log in to Render**
-   - Go to [dashboard.render.com](https://dashboard.render.com).
-
-2. **Create New Web Service**
-   - Click **"New +"** button > **"Web Service"**.
-
-3. **Connect GitHub**
-   - Select **"Build and deploy from a Git repository"**.
-   - Connect your GitHub account if not done.
-   - Select `zeeshannasir971-sudo/TruthGaurd`.
-
-4. **Configure Service**
-   - **Name:** `truthguard-backend`
-   - **Region:** Choose one close to you (e.g., Frankfurt, Oregon).
-   - **Branch:** `main`
-   - **Root Directory:** `.` (Leave empty or set to root)
-   - **Runtime:** **Python 3**
-   - **Build Command:** `pip install -r requirements.txt`
-   - **Start Command:** `python app.py`
-
-5. **Deploy**
-   - Choose **"Free"** plan.
-   - Click **"Create Web Service"**.
-   - Render will start building. Watch the logs.
-   - **Note:** It will download the ML models from Hugging Face during the first start. This might take 30-60 seconds extra.
-
-6. **Get Backend URL**
-   - Once deployed, copy the URL (e.g., `https://truthguard-backend.onrender.com`).
+4.  **Wait for Build**
+    - The Space will start "Building". It might take 3-5 minutes as it installs dependencies and downloads the models.
+    - Once "Running", you will see your API is live.
+    - **Get the URL:** Click the **Embed this space** button (top right) or look at the URL bar. It usually looks like:
+      `https://yourusername-truthguard-backend.hf.space`
+      (Make sure to use the direct URL, not the iframe one. Right-click the "Direct URL" link if available, or just append `/` to the domain).
 
 ---
 
-## 3️⃣ Connect Frontend to Backend
+## 2️⃣ Deploy Frontend (Netlify)
 
-Now that the backend is live, tell the frontend where to find it.
+1.  **Log in to Netlify**
+    - Go to [app.netlify.com](https://app.netlify.com).
 
-1. **Go to Netlify Dashboard**
-   - Select your `TruthGuard` site.
-   - Go to **"Site configuration"** > **"Environment variables"**.
+2.  **Add New Site**
+    - Click **"Add new site"** > **"Import an existing project"**.
 
-2. **Add Variable**
-   - Click **"Add a variable"**.
-   - **Key:** `NEXT_PUBLIC_API_URL`
-   - **Value:** Your Render Backend URL (e.g., `https://truthguard-backend.onrender.com`)
-   - **Scope:** All scopes (Build, Deploy, Runtime).
-   - Click **"Create variable"**.
+3.  **Connect to GitHub**
+    - Select **GitHub** and choose `zeeshannasir971-sudo/TruthGaurd`.
 
-3. **Trigger New Deploy**
-   - Go to **"Deploys"** tab.
-   - Click **"Trigger deploy"** > **"Deploy site"**.
-   - This will rebuild the frontend with the correct API URL.
+4.  **Configure Build**
+    - **Base directory:** `frontend`
+    - **Build command:** `npm run build`
+    - **Publish directory:** `.next`
+    - Click **"Deploy"**.
+
+5.  **Connect to Backend**
+    - Go to **"Site configuration"** > **"Environment variables"**.
+    - Add Variable:
+        - **Key:** `NEXT_PUBLIC_API_URL`
+        - **Value:** Your Hugging Face Space URL (e.g., `https://zeeshann07-truthguard-backend.hf.space`)
+          *Note: Ensure no trailing slash `/` at the end unless your code expects it.*
+    - Go to **"Deploys"** and **"Trigger deploy"** to update the site.
 
 ---
 
 ## ✅ Done!
-Your application is now fully deployed and production-ready.
-- **Frontend:** Accessible via your Netlify URL.
-- **Backend:** Running securely on Render.
-- **Models:** Hosted on Hugging Face and loaded dynamically.
+- **Frontend:** Netlify
+- **Backend:** Hugging Face Spaces (Docker)
+- **Cost:** $0/month
+
