@@ -201,14 +201,20 @@ project/
    - Connect this repo to Netlify.
    - It will automatically detect the `netlify.toml` config.
    - Build settings: Base `frontend`, Command `npm run build`, Publish `.next`.
+   - Set environment variable `NEXT_PUBLIC_API_URL` to your backend URL (Railway/Netlify).
    
 2. **Backend (Railway):**
    - Connect this repo to Railway.
-   - Create a new service and point it at the repo root.
-   - Railway will detect `railway.toml` and use:
-     - Builder: Railpack
-     - Start Command: `python app.py`
-   - Set Root Directory to `/` (repo root) and add environment variables as needed.
+   - Create a new service for the backend (Root Directory: `/`).
+   - Railway will detect `railway.toml` and use Railpack to run `python app.py`.
+   - Configure env vars as needed.
+
+3. **Frontend (Railway):**
+   - Create a new Railway service with Root Directory: `/frontend`.
+   - Railway will detect `frontend/railway.toml` and:
+     - Build with `npm install && npm run build`
+     - Start with `npm run start`
+   - Set `NEXT_PUBLIC_API_URL` to your backend Railway URL.
 
 ### Your Models
 The ML models are hosted on Hugging Face Hub: `https://huggingface.co/zeeshann07/truthguard-models`
