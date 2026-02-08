@@ -11,6 +11,10 @@ web_bp = Blueprint("web", __name__, template_folder="templates")
 def index():
     return render_template("index.html")
 
+@web_bp.route("/health")
+def health():
+    return jsonify({"status": "ok"}), 200
+
 @web_bp.route("/analyze", methods=["POST"])
 def analyze():
     data = request.get_json(force=True)

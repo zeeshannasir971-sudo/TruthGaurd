@@ -1,2 +1,2 @@
 build = { builder = "RAILPACK" }
-deploy = { startCommand = "python app.py", healthcheckPath = "/", healthcheckTimeout = 60 }
+deploy = { startCommand = "python app.py", healthcheckPath = "/health", healthcheckTimeout = 120, restartPolicyType = "on_failure", restartPolicyMaxRetries = 3 }
