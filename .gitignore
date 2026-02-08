@@ -22,17 +22,18 @@ wheels/
 .venv/
 venv/
 ENV/
-env/
 
-# Flask
-instance/
-.webassets-cache
-
-# Machine Learning - Exclude large model files
-*.pkl
+# Large ML files - DO NOT COMMIT
+src/ml/artifacts/*.pkl
+src/data/*.csv
 *.h5
+*.hdf5
 *.model
-src/ml/artifacts/
+*.weights
+
+# Keep directory structure
+!src/ml/artifacts/.gitkeep
+!src/data/.gitkeep
 
 # IDE
 .vscode/
@@ -47,7 +48,7 @@ Thumbs.db
 
 # Logs
 *.log
-training_log.txt
+logs/
 
 # Environment
 .env
@@ -59,18 +60,10 @@ frontend/node_modules/
 frontend/.next/
 frontend/out/
 frontend/build/
-frontend/.env.local
-frontend/.vercel
-
-# TypeScript
-*.tsbuildinfo
-frontend/next-env.d.ts
+frontend/.vercel/
+frontend/.netlify/
 
 # Testing
 .coverage
 htmlcov/
 .pytest_cache/
-
-# Large data files
-src/data/kaggle_fake_real_combined.csv
-src/data/*.csv

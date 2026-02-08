@@ -182,15 +182,28 @@ project/
 
 ## 🚀 Deployment
 
-### Quick Deploy (Free)
-- **Backend:** Heroku, Railway, Render
-- **Frontend:** Vercel, Netlify
+### Ready to Deploy?
 
-### Production Deploy
-- **Backend:** AWS EC2, DigitalOcean
-- **Frontend:** Vercel Pro, AWS Amplify
+**Quick Start (10 minutes):**
+- See `QUICK_DEPLOY.md` for rapid deployment
 
-See `DEPLOYMENT_GUIDE.md` for detailed instructions.
+**Complete Guide:**
+- See `GITHUB_DEPLOYMENT_GUIDE.md` for step-by-step instructions
+
+### Recommended Stack (Free Tier)
+- **Backend:** Railway or Render
+- **Frontend:** Vercel or Netlify
+- **Models:** Hugging Face Hub (already uploaded!)
+
+### Your Models
+The ML models are hosted on Hugging Face Hub: `https://huggingface.co/zeeshann07/truthguard-models`
+
+The application is configured to **automatically download** these models on first startup. No manual setup is required!
+- ✅ fake_news_model.pkl
+- ✅ tfidf_word_vectorizer.pkl
+- ✅ tfidf_char_vectorizer.pkl
+
+The download process runs via `src/scripts/download_assets.py` when the application initializes.
 
 ## 📚 Documentation
 

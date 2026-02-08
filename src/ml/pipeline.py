@@ -169,12 +169,43 @@ def train_model(dataset_csv: str = os.path.join("src", "data", "kaggle_fake_real
     joblib.dump(vectorizer_char, VECTORIZER_CHAR_PATH)
 
 
+_model_cache = None
+
 def load_model():
-    clf = joblib.load(MODEL_PATH)
-    # Load both vectorizers
-    vectorizer_word = joblib.load(VECTORIZER_WORD_PATH)
-    vectorizer_char = joblib.load(VECTORIZER_CHAR_PATH)
-    return clf, vectorizer_word, vectorizer_char
+    """Load model with caching and automatic download if missing."""
+    global _model_cache
+    
+    # Return cached model if available
+    if _model_cache is not None:
+        return _model_cache
+    
+    # Check if models exist, download if not
+    if not os.path.exists(MODEL_PATH):
+        print("⚠️  Model files not found. Downloading...")
+        try:
+            from src.scripts.download_assets import download_models
+            download_models()
+        except Exception as e:
+            print(f"❌ Failed to download models: {e}")
+            raise FileNotFoundError(
+                "Model files not found and download failed. "
+                "Please ensure models are uploaded to remote storage."
+            )
+    
+    # Load models
+    try:
+        clf = joblib.load(MODEL_PATH)
+        vectorizer_word = joblib.load(VECTORIZER_WORD_PATH)
+        vectorizer_char = joblib.load(VECTORIZER_CHAR_PATH)
+        
+        # Cache for future requests
+        _model_cache = (clf, vectorizer_word, vectorizer_char)
+        print("✅ Models loaded successfully")
+        
+        return _model_cache
+    except Exception as e:
+        print(f"❌ Error loading models: {e}")
+        raise
 
 
 def predict(text: str):
