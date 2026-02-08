@@ -1,0 +1,19 @@
+[build]
+  command = "pip install -r requirements.txt && python src/scripts/download_assets.py"
+  publish = "."
+
+[build.environment]
+  PYTHON_VERSION = "3.12"
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+# Increase function size limit for ML models
+[functions."*"]
+  included_files = ["src/**", "requirements.txt"]

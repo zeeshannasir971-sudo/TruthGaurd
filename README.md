@@ -72,6 +72,7 @@ Open your browser and go to: **http://localhost:3000**
 pip install -r requirements.txt
 
 # Start Flask server
+# Note: ML models will be downloaded automatically from Hugging Face on first run
 python app.py
 ```
 

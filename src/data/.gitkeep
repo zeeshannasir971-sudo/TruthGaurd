@@ -1,0 +1,2 @@
+# This file ensures the data directory is tracked by Git
+# CSV files will NOT be committed (too large for GitHub)
