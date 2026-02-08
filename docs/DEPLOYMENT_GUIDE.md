@@ -29,63 +29,42 @@ cd frontend
 npm run dev
 ```
 
-## Production Deployment
+## 🚀 Recommended Split Deployment (Best Practice)
 
-### Backend Deployment (Flask)
+Because this is a **Full Stack** application with a Machine Learning backend, the best way to deploy is to split it into two services.
 
-#### Option 1: Heroku
-```bash
-# Install Heroku CLI
-# Create Procfile
-echo "web: gunicorn app:app" > Procfile
+1.  **Frontend (Next.js) -> Netlify / Vercel** (Optimized for static/React apps)
+2.  **Backend (Python/ML) -> Render / Railway** (Optimized for long-running processes and large ML models)
 
-# Install gunicorn
-pip install gunicorn
-pip freeze > requirements.txt
+### Why not deploy everything to Netlify?
+Netlify is primarily for static sites and small serverless functions. Your ML backend uses `scikit-learn` and large model files (~100MB+), which exceeds Netlify's Function size limits (50MB).
 
-# Deploy
-heroku create your-app-name
-git push heroku main
-```
+---
 
-#### Option 2: AWS EC2
-1. Launch EC2 instance (Ubuntu)
-2. Install Python and dependencies
-3. Use Gunicorn + Nginx
-4. Configure security groups (port 5000)
+### Step 1: Deploy Backend (Render)
+1.  Push your code to GitHub.
+2.  Go to [Render.com](https://render.com) and create a **Web Service**.
+3.  Connect your GitHub repo.
+4.  Render will auto-detect the `render.yaml` file in your repo.
+5.  Click **Create Service**.
+6.  Once deployed, copy your Backend URL (e.g., `https://truthguard-backend.onrender.com`).
 
-#### Option 3: DigitalOcean App Platform
-1. Connect GitHub repository
-2. Select Python app
-3. Set build command: `pip install -r requirements.txt`
-4. Set run command: `gunicorn app:app`
+### Step 2: Deploy Frontend (Netlify)
+1.  Go to [Netlify](https://netlify.com).
+2.  **Add new site** -> **Import from Git**.
+3.  Select your GitHub repo.
+4.  **Important Settings**:
+    *   **Base directory:** `frontend`
+    *   **Build command:** `npm run build`
+    *   **Publish directory:** `.next`
+5.  **Environment Variables**:
+    *   Click "Add environment variable"
+    *   Key: `NEXT_PUBLIC_API_URL`
+    *   Value: Your Render Backend URL (from Step 1)
+6.  Click **Deploy**.
 
-### Frontend Deployment (Next.js)
+---
 
-#### Option 1: Vercel (Recommended)
-```bash
-# Install Vercel CLI
-npm i -g vercel
-
-# Deploy
-cd frontend
-vercel
-
-# Set environment variable
-# NEXT_PUBLIC_API_URL=https://your-backend-url.com
-```
-
-#### Option 2: Netlify
-1. Connect GitHub repository
-2. Build command: `npm run build`
-3. Publish directory: `.next`
-4. Add environment variable: `NEXT_PUBLIC_API_URL`
-
-#### Option 3: AWS Amplify
-1. Connect repository
-2. Build settings: Auto-detected
-3. Add environment variables
-4. Deploy
 
 ## Environment Variables
 
