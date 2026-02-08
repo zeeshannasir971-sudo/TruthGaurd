@@ -1,0 +1,9 @@
+[build]
+  # Basic build settings
+  publish = "frontend/.next"
+  command = "npm run build"
+
+[build.environment]
+  PYTHON_VERSION = "3.11"
+  # Ensure pip uses a compatible version
+  PIP_DEFAULT_TIMEOUT = "100"
