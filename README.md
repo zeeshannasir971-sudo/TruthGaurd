@@ -192,8 +192,8 @@ project/
 - See `GITHUB_DEPLOYMENT_GUIDE.md` for step-by-step instructions
 
 ### Recommended Stack (Free Tier)
-- **Frontend:** Netlify (Ready! Configured via `netlify.toml`)
-- **Backend:** Render (Ready! Configured via `render.yaml`)
+- **Frontend:** Netlify (Configured via `netlify.toml`)
+- **Backend:** Railway (Configured via `railway.toml`)
 - **Models:** Hugging Face Hub (already uploaded!)
 
 ### How to Deploy
@@ -202,13 +202,13 @@ project/
    - It will automatically detect the `netlify.toml` config.
    - Build settings: Base `frontend`, Command `npm run build`, Publish `.next`.
    
-2. **Backend (Render):**
-   - Connect this repo to Render.
-   - Choose "Web Service".
-   - It will automatically detect `render.yaml` (Blueprint) or you can set:
-     - Runtime: Python 3
-     - Build Command: `pip install -r requirements.txt`
+2. **Backend (Railway):**
+   - Connect this repo to Railway.
+   - Create a new service and point it at the repo root.
+   - Railway will detect `railway.toml` and use:
+     - Builder: Railpack
      - Start Command: `python app.py`
+   - Set Root Directory to `/` (repo root) and add environment variables as needed.
 
 ### Your Models
 The ML models are hosted on Hugging Face Hub: `https://huggingface.co/zeeshann07/truthguard-models`

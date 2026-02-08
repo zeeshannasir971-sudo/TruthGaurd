@@ -1,0 +1,2 @@
+build = { builder = "RAILPACK" }
+deploy = { startCommand = "python app.py", healthcheckPath = "/", healthcheckTimeout = 60 }
